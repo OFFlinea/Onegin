@@ -1,0 +1,12 @@
+#ifndef TEXT.H
+#define TEXT.H
+
+size_t nStrings(const struct Text* text);
+
+bool text_read(struct Text* text);
+
+void print_text(const struct Text* text);
+
+void destroy_text(struct Text* text);
+
+#
