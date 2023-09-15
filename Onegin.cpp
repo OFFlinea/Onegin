@@ -38,5 +38,4 @@ int main() {
     destroy_text(&text);
 
     return 0;
-
 }

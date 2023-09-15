@@ -105,3 +105,4 @@ void replace_0_to_n(char* buffer, const size_t sizefile) {
         }
     }
 }
+

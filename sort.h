@@ -12,3 +12,4 @@ void Sort_choice(struct String* strings_addresses, const size_t nstrings, const 
 size_t FindMin(struct String* strings_addresses, const size_t nstrings, int (*comp)(const String*, const String*));
 
 #endif
+

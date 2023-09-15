@@ -8,3 +8,4 @@ void print_text(const struct Text* text);
 void destroy_text(struct Text* text);
 
 #endif
+

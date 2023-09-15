@@ -26,3 +26,4 @@ text.o: text.cpp text.h
 
 Onegin.o: Onegin.cpp structures.h
 	$(CC) $(CFLAGS) Onegin.cpp
+

@@ -76,3 +76,4 @@ void destroy_text(struct Text* text) {
 
     text->sizefile = 0;
 }
+

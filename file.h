@@ -16,3 +16,4 @@ void clean_file(const char* filename);
 void replace_0_to_n(char* buffer, const size_t sizefile);
 
 #endif
+
