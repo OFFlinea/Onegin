@@ -20,13 +20,13 @@ int main() {
 
     text_read(&text);
 
-    Sort_choice(text.strings_addresses, text.nstrings, false);
+    Sort_choice(text.strings_addresses, text.nstrings, Strcmp);
 
     print_text(&text);
 
     file_write(text.strings_addresses, text.nstrings, filename_result);
 
-    Sort_choice(text.strings_addresses, text.nstrings, true);
+    Sort_choice(text.strings_addresses, text.nstrings, Strcmp_reverse);
 
     print_text(&text);
 

@@ -1,0 +1,469 @@
+#include <TXLib.h>
+#include <stdio.h>
+/*#include <sys/stat.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+struct String
+{
+    char* address;
+    size_t len;
+};
+
+struct Text
+{
+    struct String* strings_addresses;
+    size_t nstrings;
+    char* buffer;
+    size_t sizefile;
+};
+
+bool file_read(struct Text* text);
+
+size_t filesize(const char filename[]);
+
+size_t nStrings(const struct Text* text);
+
+bool text_read(struct Text* text);
+
+void print_text(const struct Text* text);
+
+void destroy_text(struct Text* text);
+
+//void Sort(struct String* strings_addresses, size_t left, size_t right);
+
+//size_t Partition(struct String* strings_addresses, size_t left, size_t right);
+
+void Swap(struct String* strings_addresses, size_t pos1, size_t pos2);
+
+//void bi_sort_swap(struct String* strings_addresses, size_t pos1, size_t pos2);
+
+int Strcmp(const struct String* str1, const struct String* str2);
+
+int Strcmp_reverse(const struct String* str1, const struct String* str2);
+
+size_t Max(size_t num1, size_t num2);
+
+void Sort_choice(struct String* strings_addresses, const size_t nstrings, const bool revers);
+
+size_t FindMin(struct String* strings_addresses, const size_t nstrings, int (*comp)(const String*, const String*));
+
+void file_write(const struct String* strings_addresses, const size_t nstrings, const char* filename);
+
+void file_write_buf (const char* buffer, const size_t sizefile, const char* filename);
+
+void clean_file(const char* filename);
+
+void replace_0_to_n(char* buffer, const size_t sizefile);
+
+
+int main() {
+
+    struct Text text = {};
+
+    const size_t LEN_FILE = 15;
+
+    char filename_result[LEN_FILE] = "Result.txt";
+
+    clean_file(filename_result);
+
+    file_read(&text);
+
+    text_read(&text);
+
+    //Sort(text.strings_addresses, 0, text.nstrings - 1);
+
+    Sort_choice(text.strings_addresses, text.nstrings, false);
+    print_text(&text);
+    putchar('\n');
+
+    file_write(text.strings_addresses, text.nstrings, filename_result);
+
+    Sort_choice(text.strings_addresses, text.nstrings, true);
+    print_text(&text);
+
+    file_write(text.strings_addresses, text.nstrings, filename_result);
+
+    replace_0_to_n(text.buffer, text.sizefile);
+    file_write_buf(text.buffer, text.sizefile, filename_result);
+
+    destroy_text(&text);
+
+    return 0;
+
+}
+
+
+bool file_read(struct Text* text) {
+
+    const int LEN_FILENAME = 15;
+    const char filename[LEN_FILENAME] = "Onegin.txt";
+    FILE* file = fopen(filename, "r");
+
+    if (!file) {
+
+        printf("%s\n", strerror(errno));
+        return false;
+    }
+
+    text->sizefile = filesize(filename);
+
+    text->buffer = (char*) calloc(text->sizefile + 1, sizeof(char));
+
+    if (!text->buffer) {
+
+        printf("No memory\n");
+        return false;
+    }
+
+    fread(text->buffer, sizeof(char), text->sizefile, file);
+
+    text->nstrings = nStrings(text);
+
+    fclose(file);
+
+    return true;
+}
+
+
+bool text_read(struct Text* text) {
+
+    assert(text->buffer);
+
+    text->strings_addresses = (struct String*) calloc(text->nstrings, sizeof(struct String));
+
+    if (!text->strings_addresses) {
+
+        printf("No memory\n");
+        return false;
+    }
+
+    text->strings_addresses[0] = {text->buffer, 0};
+    size_t number_string = 1;
+    size_t number_char = 0;
+    size_t len = 1;
+
+    while (text->buffer[number_char]) {
+
+        assert(number_char < text->sizefile);
+
+        if (text->buffer[number_char] == '\n') {
+
+            assert(number_string < text->nstrings);
+
+            text->buffer[number_char] = '\0';
+
+            text->strings_addresses[number_string++] = {text->buffer + number_char + 1, 0};
+
+            text->strings_addresses[number_string - 2].len = len;
+
+            len = 0;
+        }
+        number_char++;
+        len++;
+    }
+
+    text->strings_addresses[number_string - 1].len = len;
+
+
+    return true;
+}
+
+
+void print_text(const struct Text* text) {
+
+    assert(text->buffer);
+    assert(text->strings_addresses->address);
+
+    for (size_t i = 0; i < text->nstrings; i++) {
+
+        printf("%s\n", text->strings_addresses[i].address);
+    }
+}
+
+
+size_t filesize(const char filename[]) {
+
+    struct stat sizze = {};
+
+    stat(filename, &sizze);
+
+    return sizze.st_size;
+}
+
+
+size_t nStrings(const struct Text* text) {
+
+    size_t count_strings = 0;
+
+    for(size_t nchar = 0; nchar < text->sizefile; nchar++) {
+
+        count_strings += (text->buffer[nchar] == '\n') ? 1 : 0;
+    }
+
+    return count_strings + 1;
+}
+
+
+void destroy_text(struct Text* text) {
+
+    assert(text->buffer);
+    assert(text->strings_addresses);
+
+    free(text->strings_addresses);
+    text->strings_addresses = NULL;
+
+    text->nstrings = 0;
+
+    free(text->buffer);
+    text->buffer = NULL;
+
+    text->sizefile = 0;
+}
+
+
+/*size_t Partition(struct String* strings_addresses, size_t left, size_t right) {
+
+    assert(strings_addresses);
+
+    char* mid = strings_addresses[left + rand() % (right != 0) ? right : 1];
+
+    while (left < right) {
+
+        if (Strcmp(strings_addresses[left], mid) <= 0) {
+
+            left++;
+            continue;
+        }
+
+        if (Strcmp(strings_addresses[right], mid) >= 0) {
+
+            right--;
+            continue;
+        }
+
+        Swap(strings_addresses, left, right);
+        printf("index: %d, address: %p, string: %s\n", left, &strings_addresses[left], strings_addresses[left]);
+        printf("index: %d, address: %p, string: %s\n", right, &strings_addresses[right], strings_addresses[right]);
+    }
+    return left;
+}
+
+
+void Sort(struct String* strings_addresses, size_t left, size_t right) {
+
+    assert(strings_addresses);
+
+    if (left == right) {
+
+        bi_sort_swap(strings_addresses, left, right);
+        return;
+    }
+
+    size_t mid = Partition(strings_addresses, left, right);
+
+    Sort(strings_addresses, left, mid);
+
+    Sort(strings_addresses, mid + 1, right);
+}*/
+
+
+void Swap(struct String* strings_addresses, size_t pos1, size_t pos2) {
+
+    assert(strings_addresses);
+
+    String temp = strings_addresses[pos1];
+
+    strings_addresses[pos1] = strings_addresses[pos2];
+
+    strings_addresses[pos2] = temp;
+}
+
+
+/*void bi_sort_swap(struct String* strings_addresses, size_t pos1, size_t pos2) {
+
+    if (strings_addresses[pos1] > strings_addresses[pos2]) {
+
+        Swap(strings_addresses, pos1, pos2);
+    }
+}*/
+
+
+int Strcmp(const struct String* str1, const struct String* str2) {
+
+    assert(str1->address);
+    assert(str2->address);
+
+    size_t nchar1 = 0, nchar2 = 0;
+
+    while (str1->address[nchar1] != '\0' && str2->address[nchar2] != '\0') {
+
+        if (!isalpha(str1->address[nchar1])) {
+
+            nchar1++;
+            continue;
+        }
+
+        if (!isalpha(str2->address[nchar2])) {
+
+            nchar2++;
+            continue;
+        }
+
+        if (str1->address[nchar1] > str2->address[nchar2]) {
+
+            return 1;
+        }
+
+        if (str1->address[nchar1] < str2->address[nchar2]) {
+
+            return -1;
+        }
+
+        nchar1++;
+        nchar2++;
+    }
+
+    if (str1->address[nchar1] == '\0' && str2->address[nchar2] != '\0') {
+
+        return -1;
+    }
+
+    else if (str2->address[nchar2] == '\0' && str1->address[nchar1] != '\0') {
+
+        return 1;
+    }
+    return 0;
+}
+
+size_t Max(size_t num1, size_t num2) {
+
+    return (num1 > num2) ? num1 : num2;
+}
+
+
+void Sort_choice(struct String* strings_addresses, const size_t nstrings, const bool revers) {
+
+    for (size_t nstr = 0; nstr < nstrings; nstr++) {
+
+        size_t min_str = FindMin(strings_addresses + nstr, nstrings - nstr,
+        (revers) ? Strcmp_reverse : Strcmp) + nstr;
+
+        if (min_str == nstr) {
+
+            break;
+        }
+        Swap(strings_addresses, min_str, nstr);
+    }
+}
+
+
+size_t FindMin(struct String* strings_addresses, const size_t nstrings, int (*comp)(const String*, const String*)) {
+
+    size_t min_str = 0;
+
+    for (size_t nstr = 0; nstr < nstrings; nstr++) {
+
+        if ((*comp)(&strings_addresses[min_str], &strings_addresses[nstr]) > 0) {
+
+            min_str = nstr;
+        }
+    }
+
+    return min_str;
+}
+
+
+int Strcmp_reverse(const struct String* str1, const struct String* str2) {
+
+    assert(str1->address);
+    assert(str2->address);
+
+    int nchar1 = str1->len - 1;
+    int nchar2 = str2->len - 1;
+
+    while (nchar1 >= 0 && nchar2 >= 0) {
+
+        if (!isalpha(str1->address[nchar1])) {
+
+            nchar1--;
+            continue;
+        }
+
+        if (!isalpha(str2->address[nchar2])) {
+
+            nchar2--;
+            continue;
+        }
+
+        if (str1->address[nchar1] > str2->address[nchar2]) {
+
+            return 1;
+        }
+
+        if (str1->address[nchar1] < str2->address[nchar2]) {
+
+            return -1;
+        }
+
+        nchar1--;
+        nchar2--;
+    }
+
+    if (nchar1 == -1 && nchar2 != -1) {
+
+        return -1;
+    }
+
+    else if (nchar2 == -1 && nchar1 != -1) {
+
+        return 1;
+    }
+
+    return 0;
+}
+
+
+void file_write(const struct String* strings_addresses, const size_t nstrings, const char* filename) {
+
+    FILE* file = fopen(filename, "a");
+
+    for (size_t nstr = 0; nstr < nstrings; nstr++) {
+
+        fputs(strings_addresses[nstr].address, file);
+        fputc('\n', file);
+    }
+
+    fputc('\n', file);
+    fclose(file);
+}
+
+
+void clean_file(const char* filename) {
+
+    FILE* file = fopen(filename, "w");
+    fclose(file);
+}
+
+
+void file_write_buf(const char* buffer, const size_t sizefile, const char* filename) {
+
+    FILE* file = fopen(filename, "a");
+
+    fwrite(buffer, sizeof(char), sizefile, file);
+
+    fclose(file);
+
+}
+
+
+void replace_0_to_n(char* buffer, const size_t sizefile) {
+
+    for (size_t nchar = 0; nchar < sizefile; nchar++) {
+
+        if (buffer[nchar] == '\0') {
+
+            buffer[nchar] = '\n';
+        }
+    }
+}

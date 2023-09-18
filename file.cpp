@@ -9,7 +9,7 @@
 
 bool file_read(struct Text* text) {
 
-    const int LEN_FILENAME = 15;
+    const size_t LEN_FILENAME = 15;
     const char filename[LEN_FILENAME] = "Onegin.txt";
     FILE* file = fopen(filename, "r");
 
@@ -54,9 +54,15 @@ size_t nStrings(const struct Text* text) {
 
 size_t filesize(const char filename[]) {
 
+    assert(filename);
+
     struct stat sizze = {};
 
-    stat(filename, &sizze);
+    if (stat(filename, &sizze) == -1) {
+
+        printf("%s\n", strerror(errno));
+        return 0;
+    }
 
     return sizze.st_size;
 }
@@ -65,6 +71,12 @@ size_t filesize(const char filename[]) {
 void file_write(const struct String* strings_addresses, const size_t nstrings, const char* filename) {
 
     FILE* file = fopen(filename, "a");
+
+    if (!file) {
+
+        printf("%s\n", strerror(errno));
+        return;
+    }
 
     for (size_t nstr = 0; nstr < nstrings; nstr++) {
 

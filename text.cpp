@@ -12,7 +12,8 @@ bool text_read(struct Text* text) {
 
     if (!text->strings_addresses) {
 
-        printf("No memory\n");
+        printf("No memory\n"
+               "Please buy more RAM\n");
         return false;
     }
 
