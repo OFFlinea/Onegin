@@ -6,6 +6,7 @@
 
 bool text_read(struct Text* text) {
 
+    assert(text);
     assert(text->buffer);
 
     text->strings_addresses = (struct String*) calloc(text->nstrings, sizeof(struct String));
@@ -51,6 +52,7 @@ bool text_read(struct Text* text) {
 
 void print_text(const struct Text* text) {
 
+    assert(text);
     assert(text->buffer);
     assert(text->strings_addresses->address);
 
@@ -64,8 +66,10 @@ void print_text(const struct Text* text) {
 
 void destroy_text(struct Text* text) {
 
+    assert(text);
     assert(text->buffer);
     assert(text->strings_addresses);
+    assert(text->strings_addresses->address);
 
     free(text->strings_addresses);
     text->strings_addresses = NULL;

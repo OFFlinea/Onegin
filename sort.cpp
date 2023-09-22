@@ -7,6 +7,7 @@
 void Swap(struct String* strings_addresses, size_t pos1, size_t pos2) {
 
     assert(strings_addresses);
+    assert(strings_addresses->address);
 
     String temp = strings_addresses[pos1];
 
@@ -16,25 +17,28 @@ void Swap(struct String* strings_addresses, size_t pos1, size_t pos2) {
 }
 
 
-bool skip_no_alpha(const char c, int* counter, const bool revers) {
+void skip_no_alpha(const char* buffer, int* counter, const bool revers) {
 
+    assert(buffer);
     assert(counter);
 
-    if (!isalpha(c)) {
+    int ADD = 0;
 
-        if (revers) {
+    if (revers) {
 
-            *counter -= 1;
-        }
-
-        else {
-
-            *counter += 1;
-        }
-
-        return true;
+        ADD = -1;
     }
-    return false;
+
+    else {
+
+        ADD = 1;
+    }
+
+    char c = 1;
+    while (!isalpha(c = buffer[*counter]) and c != '\0') {
+
+        *counter += ADD;
+    }
 }
 
 
@@ -47,10 +51,8 @@ int Strcmp(const struct String* str1, const struct String* str2) {
 
     while (str1->address[nchar1] != '\0' && str2->address[nchar2] != '\0') {
 
-        if (skip_no_alpha(str1->address[nchar1], &nchar1, false) || skip_no_alpha(str2->address[nchar2], &nchar2, false)) {
-
-            continue;
-        }
+        skip_no_alpha(str1->address, &nchar1, false);
+        skip_no_alpha(str2->address, &nchar2, false);
 
         if (str1->address[nchar1] > str2->address[nchar2]) {
 
@@ -79,12 +81,15 @@ int Strcmp(const struct String* str1, const struct String* str2) {
 }
 
 
-void Sort_choice(struct String* strings_addresses, const size_t nstrings, int (*comp)(const String*, const String*)) {   // this is krivo!!!
+void Sort_choice(struct String* strings_addresses,
+        const size_t nstrings, int (*comp)(const String*, const String*)) {
+
+    assert(strings_addresses);
+    assert(strings_addresses->address);
 
     for (size_t nstr = 0; nstr < nstrings; nstr++) {
 
-        size_t min_str = FindMin(strings_addresses + nstr, nstrings - nstr,
-        comp) + nstr;
+        size_t min_str = FindMin(strings_addresses + nstr, nstrings - nstr, comp) + nstr;
 
         if (min_str == nstr) {
 
@@ -95,7 +100,11 @@ void Sort_choice(struct String* strings_addresses, const size_t nstrings, int (*
 }
 
 
-size_t FindMin(struct String* strings_addresses, const size_t nstrings, int (*comp)(const String*, const String*)) {
+size_t FindMin(struct String* strings_addresses, const size_t nstrings,
+        int (*comp)(const String*, const String*)) {
+
+    assert(strings_addresses);
+    assert(strings_addresses->address);
 
     size_t min_str = 0;
 
@@ -121,10 +130,8 @@ int Strcmp_reverse(const struct String* str1, const struct String* str2) {
 
     while (nchar1 >= 0 && nchar2 >= 0) {
 
-        if (skip_no_alpha(str1->address[nchar1], &nchar1, true) || skip_no_alpha(str2->address[nchar2], &nchar2, true)) {
-
-            continue;
-        }
+        skip_no_alpha(str1->address, &nchar1, true);
+        skip_no_alpha(str2->address, &nchar2, true);
 
         if (str1->address[nchar1] > str2->address[nchar2]) {
 

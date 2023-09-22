@@ -9,6 +9,8 @@
 
 bool file_read(struct Text* text) {
 
+    assert(text);
+
     const size_t LEN_FILENAME = 15;
     const char filename[LEN_FILENAME] = "Onegin.txt";
     FILE* file = fopen(filename, "r");
@@ -41,6 +43,9 @@ bool file_read(struct Text* text) {
 
 size_t nStrings(const struct Text* text) {
 
+    assert(text);
+    assert(text->buffer);
+
     size_t count_strings = 0;
 
     for(size_t nchar = 0; nchar < text->sizefile; nchar++) {
@@ -70,6 +75,10 @@ size_t filesize(const char filename[]) {
 
 void file_write(const struct String* strings_addresses, const size_t nstrings, const char* filename) {
 
+    assert(strings_addresses);
+    assert(strings_addresses->address);
+    assert(filename);
+
     FILE* file = fopen(filename, "a");
 
     if (!file) {
@@ -91,12 +100,17 @@ void file_write(const struct String* strings_addresses, const size_t nstrings, c
 
 void clean_file(const char* filename) {
 
+    assert(filename);
+
     FILE* file = fopen(filename, "w");
     fclose(file);
 }
 
 
 void file_write_buf(const char* buffer, const size_t sizefile, const char* filename) {
+
+    assert(buffer);
+    assert(filename);
 
     FILE* file = fopen(filename, "a");
 
@@ -108,6 +122,8 @@ void file_write_buf(const char* buffer, const size_t sizefile, const char* filen
 
 
 void replace_0_to_n(char* buffer, const size_t sizefile) {
+
+    assert(buffer);
 
     for (size_t nchar = 0; nchar < sizefile; nchar++) {
 

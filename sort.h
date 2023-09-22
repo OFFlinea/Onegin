@@ -3,7 +3,7 @@
 
 void Swap(struct String* strings_addresses, size_t pos1, size_t pos2);
 
-bool skip_no_alpha(const char c, int* counter, const bool revers);
+void skip_no_alpha(const char* buffer, int* counter, const bool revers);
 
 int Strcmp(const struct String* str1, const struct String* str2);
 
